@@ -7,7 +7,7 @@ Created on Fri Oct 18 20:32:40 2024
 
 import os
 import numpy as np
-from model import simulate
+from model_extended import simulate
 import matplotlib.pyplot as plt
 
 
@@ -35,7 +35,7 @@ def hill_vs_sigmoid(c = 0.02, k_s = 250, k_h = [16,24],prevalence_min=0.4,preval
     ax.set_xticklabels([('c = ' if np.isclose(el, 100*c) else '') + str((el))+'%' for el in [0.4,2,10]])  
     legend = ax.legend(loc='center', frameon=False,bbox_to_anchor=[0.38,0.9],ncol=1)
     #legend = ax.legend(loc='center', frameon=False,bbox_to_anchor=[0.84,0.2],ncol=1)
-    file_path = os.path.join(folder_name, 'hill_vs_sigmoid.pdf')
+    file_path = os.path.join(folder_name, 'hill_vs_sigmoid_extended.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -70,11 +70,11 @@ def no_delay_dynamics():
     ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False)
     ax.spines[['right','top']].set_visible(False)
     ax2.spines[['top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'no_delay_dynamics.pdf')
+    file_path = os.path.join(folder_name, 'no_delay_dynamics_extended.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
-def no_delay_dynamics_mod():
+def no_delay_dynamics_mod(tau=10):
     color = ['k', 'r', 'b']
     fig, ax = plt.subplots(figsize=(5,3))
     ax2 = ax.twinx()
@@ -89,7 +89,7 @@ def no_delay_dynamics_mod():
     ax.plot(ts, I, color=color[1], linestyle='-')
     ax2.plot(ts, Reff, color=color[1], linestyle='--')
         
-    ts, results, reduction, Reff = simulate(case='Hill',tau=5)
+    ts, results, reduction, Reff = simulate(case='Hill',tau=tau)
     I = results[:, 1]
     ax.plot(ts, I, color=color[2], linestyle='-')
     ax2.plot(ts, Reff, color=color[2], linestyle='--')
@@ -106,14 +106,14 @@ def no_delay_dynamics_mod():
     legend_elements = [
                         Line2D([0], [0], color=color[0], linestyle='-', lw=7, label='no contact reduction (standard SIR model)'),
                         Line2D([0], [0], color=color[1], linestyle='-', lw=7, label='immediate fear-based contact reduction'),
-                        Line2D([0], [0], color=color[2], linestyle='-', lw=7, label=r'5-day delayed contact reduction'),
+                        Line2D([0], [0], color=color[2], linestyle='-', lw=7, label=str(tau)+'-day delayed contact reduction'),
                         Line2D([0], [0], color='k', linestyle='-', lw=2, label='prevalence'),
                         Line2D([0], [0], color='k', linestyle='--', lw=2, label='$R_{eff}$')
                         ]
     ax.legend(handles=legend_elements, loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2, frameon=False)
     ax.spines[['right','top']].set_visible(False)
     ax2.spines[['top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod.pdf')
+    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod_extended.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -172,7 +172,7 @@ def no_delay_dynamics_mod2(delay = 5,t_end=500,ylim_top = [11.5,14.2],ylim_botto
     #legend = ax1.legend(loc='best', frameon=False)
     #legend.set_title("behavioral response midpoint ($c$)")
     #ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod2_dynamics.pdf')
+    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod2_dynamics_extended.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -189,7 +189,7 @@ def no_delay_dynamics_mod2(delay = 5,t_end=500,ylim_top = [11.5,14.2],ylim_botto
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title(r"delay $(\tau)$")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod2_reduction.pdf')
+    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod2_reduction_extended.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
 
@@ -207,7 +207,7 @@ def no_delay_dynamics_mod2(delay = 5,t_end=500,ylim_top = [11.5,14.2],ylim_botto
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title("behavioral response midpoint ($c$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod2_Reff.pdf')
+    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod2_Reff_extended.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -293,7 +293,7 @@ def no_delay_dynamics_mod3(delay = 5,t_end=500,ylim_top = [11.5,14.2],ylim_botto
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title("behavioral response midpoint ($c$)")
     ax4.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod3_all.pdf')
+    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod3_all_extended.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
 
@@ -405,16 +405,16 @@ def no_delay_dynamics_mod4(delay = 5,t_end=500,ylim_top = [13.5,16.5],ylim_botto
     ax4.spines[['right','top']].set_visible(False)
     ax4.set_xticklabels(['' for _ in ax4.get_xticks()])
 
-    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod3_all.pdf')
+    file_path = os.path.join(folder_name, 'no_delay_dynamics_mod3_all_extended.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
-def prevalence_v_reduction_plot(case='Hill',delay=0):
+def prevalence_v_reduction_plot(case='Hill',delay=0,e=0.2,beta_e=0):
     fig, ax = plt.subplots(figsize=(2,2.5))
     color = ['k', 'r', 'b']
     # ax2 = ax.twinx()
-    ts, results, reduction, Reff = simulate(case=case,tau=delay)
-    I = results[:, 1]
+    ts, results, reduction, Reff = simulate(case=case,tau=delay,e=e,beta_e=beta_e)
+    I = results[:, 2]
     ax.plot(I, reduction, color=color[2], linestyle='-',label='delay = %g days' % delay)
     ax.axvline(x=2, color='gray', linestyle=':',linewidth=1)
     indices = np.array([0,200,250,300,500,700,918,1700])#np.linspace(0,1500,10,dtype=int)
@@ -422,8 +422,10 @@ def prevalence_v_reduction_plot(case='Hill',delay=0):
         if i < len(I) - 1:  # Ensure the index is valid
             ax.annotate('', xy=(I[i + 1], reduction[i + 1]), xytext=(I[i], reduction[i]),
                         arrowprops=dict(arrowstyle='-|>', color=color[2], linewidth=1.5, mutation_scale=15))
-    ts, results, reduction, Reff = simulate(case=case)
-    I = results[:, 1]
+    
+    
+    ts, results, reduction, Reff = simulate(case=case,e=e,beta_e=beta_e)
+    I = results[:, 2]
     ax.plot(I, reduction, color=color[1], linestyle='-',label='no delay')
     indices = np.array([0,150,250,600,2000])
     for i in indices:
@@ -439,13 +441,13 @@ def prevalence_v_reduction_plot(case='Hill',delay=0):
     ax.set_yticks(yticks)
     # ax2.set_ylim(bottom=-0.05, top=1)
     # ax2.plot(ts,np.ones(len(ts)), linestyle=':', color='gray', linewidth=1)
-    ax.set_xticklabels([str(int(el)) + '%' for el in ax.get_xticks()])
+    ax.set_xticklabels([(str(int(el)) + '%') if np.isclose(int(el),el) else '' for el in ax.get_xticks()])
     ax.set_yticklabels([str(int(el*100)) + '%' for el in ax.get_yticks()])
     # ax2.set_yticklabels([str(int(el*100)) + '%' for el in ax2.get_yticks()])
     #ax.legend(loc='best',ncol=1, frameon=False)
     ax.spines[['right','top']].set_visible(False)
     # ax2.spines[['top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'prevalence_v_reduction.pdf')
+    file_path = os.path.join(folder_name, 'prevalence_v_reduction_extended_delay%s_e%s_betae%s.pdf' % (str(delay),str(e),str(beta_e)))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
 
@@ -469,7 +471,7 @@ def delay_dynamics(delay_range=[5]):
         ax2.set_ylim([-0.05*Reff.max(),1.05*Reff.max()])
         ax2.spines[['top']].set_visible(False)
         
-        file_path = os.path.join(folder_name, 'delay_dynamics_with_delay_of_'+str(delay)+'_days.pdf')
+        file_path = os.path.join(folder_name, 'delay_dynamics_with_delay_of_'+str(delay)+'_days_extended.pdf')
         plt.savefig(file_path, format='pdf', bbox_inches='tight')
         plt.show()
 
@@ -497,7 +499,7 @@ def dynamics_for_varying_k(delay=5, k_range=[8, 16, 24],case='Hill'):
     legend = ax.legend(loc='center', frameon=False,bbox_to_anchor=[0.5,1.1],ncol=3)
     legend.set_title("behavioral response sensitivity ($k_h$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'dynamics_for_varying_k_delay%s_kvalues%s.pdf' % (str(delay),'_'.join(list(map(str,k_range)))))
+    file_path = os.path.join(folder_name, 'dynamics_for_varying_k_delay%s_kvalues%s_extended.pdf' % (str(delay),'_'.join(list(map(str,k_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -514,7 +516,7 @@ def dynamics_for_varying_k(delay=5, k_range=[8, 16, 24],case='Hill'):
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title("sensitivity of\nresponse ($k_h$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'reduction_for_varying_k_delay%s_kvalues%s.pdf' % (str(delay),'_'.join(list(map(str,k_range)))))
+    file_path = os.path.join(folder_name, 'reduction_for_varying_k_delay%s_kvalues%s_extended.pdf' % (str(delay),'_'.join(list(map(str,k_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -532,7 +534,7 @@ def dynamics_for_varying_k(delay=5, k_range=[8, 16, 24],case='Hill'):
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title("sensitivity of\nresponse ($k_h$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'Reff_for_varying_k_delay%s_kvalues%s.pdf' % (str(delay),'_'.join(list(map(str,k_range)))))
+    file_path = os.path.join(folder_name, 'Reff_for_varying_k_delay%s_kvalues%s_extended.pdf' % (str(delay),'_'.join(list(map(str,k_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -560,7 +562,7 @@ def dynamics_for_varying_c(delay=5, c_range=[1,2,4],ymax = 6.2,case='Hill',k=16)
     legend = ax.legend(loc='center', frameon=False,bbox_to_anchor=[0.5,1.1],ncol=3)
     legend.set_title("behavioral response midpoint ($c$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'dynamics_for_varying_c_delay%s_cvalues%s_%s_k%i.pdf' % (str(delay),'_'.join(list(map(str,c_range))),case,k))
+    file_path = os.path.join(folder_name, 'dynamics_for_varying_c_delay%s_cvalues%s_%s_k%i_extended.pdf' % (str(delay),'_'.join(list(map(str,c_range))),case,k))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -577,7 +579,7 @@ def dynamics_for_varying_c(delay=5, c_range=[1,2,4],ymax = 6.2,case='Hill',k=16)
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title("half-maximal reduction point ($c$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'reduction_for_varying_c_delay%s_cvalues%s_%s_k%i.pdf' % (str(delay),'_'.join(list(map(str,c_range))),case,k))
+    file_path = os.path.join(folder_name, 'reduction_for_varying_c_delay%s_cvalues%s_%s_k%i_extended.pdf' % (str(delay),'_'.join(list(map(str,c_range))),case,k))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -595,11 +597,11 @@ def dynamics_for_varying_c(delay=5, c_range=[1,2,4],ymax = 6.2,case='Hill',k=16)
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title("half-maximal reduction point ($c$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'Reff_for_varying_c_delay%s_cvalues%s_%s_k%i.pdf' % (str(delay),'_'.join(list(map(str,c_range))),case,k))
+    file_path = os.path.join(folder_name, 'Reff_for_varying_c_delay%s_cvalues%s_%s_k%i_extended.pdf' % (str(delay),'_'.join(list(map(str,c_range))),case,k))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
-def dynamics_for_varying_delay(delay_range=[2,5,18],t_end=500,ylim_top = [11.5,14.2],ylim_bottom = [-0.3,5], color = ['cyan','k','orange']):
+def dynamics_for_varying_delay(delay_range=[2,5,18],t_end=150,ylim_top = [11.5,14.2],ylim_bottom = [-0.3,5], color = ['cyan','k','orange']):
     I = []
     r = []
     reffs = []
@@ -644,15 +646,15 @@ def dynamics_for_varying_delay(delay_range=[2,5,18],t_end=500,ylim_top = [11.5,1
     ax2.set_yticklabels([str(int(el)) + '%' for el in ax2.get_yticks()])
     ax2.yaxis.set_label_coords(-0.02, 0.5, transform=fig.transFigure)
     #ax.grid(False)
-    ax1.set_xlim([0, 150])
-    ax2.set_xlim([0, 150])
+    ax1.set_xlim([0, t_end])
+    ax2.set_xlim([0, t_end])
     #ax.set_ylim(bottom=None, top=6.2)
     legend = ax1.legend(loc='center', frameon=False,bbox_to_anchor=[0.5,1.3],ncol=3)
 
     #legend = ax1.legend(loc='best', frameon=False)
     legend.set_title(r"delay $(\tau)$")
     #ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'dynamics_for_varying_delay_values%s.pdf' % ('_'.join(list(map(str,delay_range)))))
+    file_path = os.path.join(folder_name, 'dynamics_for_varying_delay_values%s_extended.pdf' % ('_'.join(list(map(str,delay_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -664,12 +666,12 @@ def dynamics_for_varying_delay(delay_range=[2,5,18],t_end=500,ylim_top = [11.5,1
     ax.set_ylabel('contact reduction')
     ax.set_yticklabels([str(int(el*100)) + '%' for el in ax.get_yticks()])
     ax.grid(False)
-    ax.set_xlim([0, 150])
+    ax.set_xlim([0, t_end])
     ax.set_ylim([-0.05, 1.05])
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title(r"delay $(\tau)$")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'reduction_for_varying_delay_values%s.pdf' % ('_'.join(list(map(str,delay_range)))))
+    file_path = os.path.join(folder_name, 'reduction_for_varying_delay_values%s_extended.pdf' % ('_'.join(list(map(str,delay_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
 
@@ -682,12 +684,12 @@ def dynamics_for_varying_delay(delay_range=[2,5,18],t_end=500,ylim_top = [11.5,1
     #ax.set_yticklabels([str(int(el*100)) + '%' for el in ax.get_yticks()])
     ax.grid(False)
     ax.plot([-1,10000],[1,1],linestyle=':', color='gray', linewidth=1)
-    ax.set_xlim([0, 150])
+    ax.set_xlim([0, t_end])
     ax.set_ylim([-0.05, 2.05])
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title("half-maximal reduction point ($c$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'Reff_for_varying_delay_values%s.pdf' % ('_'.join(list(map(str,delay_range)))))
+    file_path = os.path.join(folder_name, 'Reff_for_varying_delay_values%s_extended.pdf' % ('_'.join(list(map(str,delay_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -744,7 +746,7 @@ def dynamics_for_varying_c_broken_axis(delay = 5, c_range=[2,5,18],t_end=500,yli
     #legend = ax1.legend(loc='best', frameon=False)
     legend.set_title("behavioral response midpoint ($c$)")
     #ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'dynamics_for_varying_c_delay%s_cvalues%s.pdf' % (str(delay),'_'.join(list(map(str,c_range)))))
+    file_path = os.path.join(folder_name, 'dynamics_for_varying_c_delay%s_cvalues%s_extended.pdf' % (str(delay),'_'.join(list(map(str,c_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
@@ -761,7 +763,7 @@ def dynamics_for_varying_c_broken_axis(delay = 5, c_range=[2,5,18],t_end=500,yli
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title(r"delay $(\tau)$")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'reduction_for_varying_c_delay%s_cvalues%s.pdf' % (str(delay),'_'.join(list(map(str,c_range)))))
+    file_path = os.path.join(folder_name, 'reduction_for_varying_c_delay%s_cvalues%s_extended.pdf' % (str(delay),'_'.join(list(map(str,c_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
 
@@ -779,7 +781,7 @@ def dynamics_for_varying_c_broken_axis(delay = 5, c_range=[2,5,18],t_end=500,yli
     #legend = ax.legend(loc='best', frameon=False)
     #legend.set_title("behavioral response midpoint ($c$)")
     ax.spines[['right','top']].set_visible(False)
-    file_path = os.path.join(folder_name, 'Reff_for_varying_c_delay%s_cvalues%s.pdf' % (str(delay),'_'.join(list(map(str,c_range)))))
+    file_path = os.path.join(folder_name, 'Reff_for_varying_c_delay%s_cvalues%s_extended.pdf' % (str(delay),'_'.join(list(map(str,c_range)))))
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     

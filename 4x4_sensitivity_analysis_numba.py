@@ -12,7 +12,7 @@ from matplotlib.colors import ListedColormap, BoundaryNorm
 
 from func_file_utils import save_data, load_data
 from sensitivity_analysis_2d import find_peak_nums
-from model_extended import simulate
+from model import simulate
 
 
 def max_tau_matrix_with_optimized_runtime():
@@ -57,7 +57,7 @@ def max_tau_matrix_with_optimized_runtime():
                 'tau_matrix': tau_matrix,
                 'wave_num_matrix': wave_num_matrix,
             })
-    save_data(data_dict, '4X4_data_hill_func_hill_SEIR.pkl')
+    save_data(data_dict, '4X4_data_hill_func_hill.pkl')
 
 
 def max_tau_matrix_with_optimized_runtime_mod():
@@ -102,7 +102,7 @@ def max_tau_matrix_with_optimized_runtime_mod():
                 'tau_matrix': tau_matrix,
                 'wave_num_matrix': wave_num_matrix,
             })
-    save_data(data_dict, '4X4_data_hill_func_hill_mod_SEIR.pkl')
+    save_data(data_dict, '4X4_data_hill_func_hill_mod.pkl')
 
 def max_tau_matrix_with_optimized_runtime_mod2():
     r0_range = np.linspace(1.5, 4, 6)
@@ -146,7 +146,7 @@ def max_tau_matrix_with_optimized_runtime_mod2():
                 'tau_matrix': tau_matrix,
                 'wave_num_matrix': wave_num_matrix,
             })
-    save_data(data_dict, '4X4_data_hill_func_hill_mod2_SEIR.pkl')
+    save_data(data_dict, '4X4_data_hill_func_hill_mod2.pkl')
 
 
 def find_matrix_for_ck_from_optimized_runtime_data(data,c,k):
@@ -178,7 +178,7 @@ def draw_4X4_plot(data):
         c = entry['c']
         k = entry['k']
         tau_matrix = entry['tau_matrix']
-        #print(f"Tau matrix for c = {c}, k = {k}:\n{tau_matrix}")
+        print(f"Tau matrix for c = {c}, k = {k}:\n{tau_matrix}")
         local_max = np.max(tau_matrix)
         local_min = np.min(tau_matrix)
         if local_max > global_max:
@@ -212,11 +212,7 @@ def draw_4X4_plot(data):
                                           fontsize=8)
             
             y_axis_ticks = [0.1,0.4,0.7,1.0]
-            y_axis_ticks = [data['parameters']['beta_range'].min(),data['parameters']['beta_range'].max()]
-            y_axis_ticks = [0.1,0.3,0.6,0.8]
-            
             y_axis_vals = [0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
-            y_axis_vals = data['parameters']['beta_range']
             ax[j,i].set_yticks(infer_ticks(y_axis_ticks,y_axis_vals))
             if i==0:
                 ax[j,i].set_yticklabels(list(map(str,y_axis_ticks)))
@@ -235,12 +231,9 @@ def draw_4X4_plot(data):
     cbar = f.colorbar(images[0], cax=cbar_ax)
     exten = 2 if global_max%2==0 else 1
     tick_locs = np.arange(global_min + 0.5, global_max + exten + 0.5)
-    #cbar.set_ticks(tick_locs[(tick_locs-0.5) % 2 == 0])
-    tick_locs = [0,3,6,9,12,15,18]
-    cbar.set_ticks(tick_locs)    
+    cbar.set_ticks(tick_locs[(tick_locs-0.5) % 2 == 0])
     tick_labs = np.arange(global_min, global_max + exten, dtype=int)
-    #cbar.set_ticklabels(tick_labs[tick_labs % 2 == 0])
-    cbar.set_ticklabels(map(str,tick_locs))
+    cbar.set_ticklabels(tick_labs[tick_labs % 2 == 0])
     cbar.set_label(r'delay causing the maximal number of waves')
     cbar.ax.tick_params(length=0)
     cbar.ax.yaxis.set_tick_params(which='both',length=0)
@@ -254,7 +247,7 @@ def draw_4X4_plot(data):
         spine.set_visible(False)
     ax_left.plot([0,0],[0,1],'k-',lw=0.5)
     ax_left.set_ylim([0,1])
-    ax_left.text(-0.3,0.5,'behavioral response sensitivity',ha='center',va='center',rotation=90)    
+    ax_left.text(-0.3,0.5,'sensitivity of the contact reduction function',ha='center',va='center',rotation=90)    
     
     ax_left.text(-0.1,0.25,'high ('+r'$k_h =$ '+str(k_range[1])+')',ha='center',va='center',rotation=90)    
     ax_left.text(-0.1,0.75,'low ('+r'$k_h =$ '+str(k_range[0])+')',ha='center',va='center',rotation=90)    
@@ -266,7 +259,7 @@ def draw_4X4_plot(data):
         spine.set_visible(False)
     ax_top.plot([0,1],[0,0],'k-',lw=0.5)
     ax_top.set_xlim([0,1])
-    ax_top.text(0.5,0.3,'behavioral response midpoint',ha='center',va='center')    
+    ax_top.text(0.5,0.3,'half-maximal reduction point',ha='center',va='center')    
     ax_top.text(0.25,0.1,'low ('+r'$c =$ '+str(c_range[0])+'%)',ha='center',va='center',rotation=0)    
     ax_top.text(0.75,0.1,'high ('+r'$c =$ '+str(c_range[1])+'%)',ha='center',va='center',rotation=0)    
     
@@ -276,7 +269,7 @@ def draw_4X4_plot(data):
     folder_name = os.path.join('data', 'hill_figs')
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    file_path = os.path.join(folder_name, '4x4_sensitivity_extended.pdf')
+    file_path = os.path.join(folder_name, '4x4_sensitivity.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
 
@@ -286,7 +279,7 @@ if __name__ == "__main__":
     max_tau_matrix_with_optimized_runtime()
     
     try:
-        data = load_data('4X4_data_hill_func_hill_SEIR.pkl')
+        data = load_data('4X4_data_hill_func_hill.pkl')
         print("Data loaded successfully")
     except FileNotFoundError as e:
         print(e)
@@ -296,9 +289,9 @@ if __name__ == "__main__":
 
     figsize=(3,2.5)
 
-    max_tau_matrix_with_optimized_runtime_mod()
+    #max_tau_matrix_with_optimized_runtime_mod()
     try:
-        data = load_data('4X4_data_hill_func_hill_mod_SEIR.pkl')
+        data = load_data('4X4_data_hill_func_hill_mod.pkl')
         print("Data loaded successfully")
     except FileNotFoundError as e:
         print(e)
@@ -320,7 +313,7 @@ if __name__ == "__main__":
     folder_name = os.path.join('data', 'hill_figs')
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    file_path = os.path.join(folder_name, 'relationship_beta_extended.pdf')
+    file_path = os.path.join(folder_name, 'relationship_beta.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()    
     
@@ -337,14 +330,14 @@ if __name__ == "__main__":
     folder_name = os.path.join('data', 'hill_figs')
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    file_path = os.path.join(folder_name, 'relationship_beta_DGT_extended.pdf')
+    file_path = os.path.join(folder_name, 'relationship_beta_DGT.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()   
     
     
-    max_tau_matrix_with_optimized_runtime_mod2()
+    #max_tau_matrix_with_optimized_runtime_mod2()
     try:
-        data = load_data('4X4_data_hill_func_hill_mod2_SEIR.pkl')
+        data = load_data('4X4_data_hill_func_hill_mod2.pkl')
         print("Data loaded successfully")
     except FileNotFoundError as e:
         print(e)
@@ -366,7 +359,7 @@ if __name__ == "__main__":
     folder_name = os.path.join('data', 'hill_figs')
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    file_path = os.path.join(folder_name, 'relationship_gamma_extended.pdf')
+    file_path = os.path.join(folder_name, 'relationship_gamma.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()   
     
@@ -374,7 +367,7 @@ if __name__ == "__main__":
     for i in range(tau_matrix.shape[0]):
         argmax_waves = np.argmax(np.bincount(np.array(wave_num_matrix[i],dtype=int)))
         which = wave_num_matrix[i] == argmax_waves
-        ax.plot(5+1/(gamma_range[which]),tau_matrix[i][which],label=r'$R_0 =$ '+str(ro_range[i]) + ' ('+str(argmax_waves)+' waves)')
+        ax.plot(1/(gamma_range[which]),tau_matrix[i][which],label=r'$R_0 =$ '+str(ro_range[i]) + ' ('+str(argmax_waves)+' waves)')
     ax.set_xlabel(r'disease generation time')
     ax.set_ylabel(r'wave-maximizing delay $\tau$')
     #ax.legend(loc='best',frameon=False)#,title='basic reproduction number')
@@ -382,6 +375,6 @@ if __name__ == "__main__":
     folder_name = os.path.join('data', 'hill_figs')
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
-    file_path = os.path.join(folder_name, 'relationship_gamma_DGT_extended.pdf')
+    file_path = os.path.join(folder_name, 'relationship_gamma_DGT.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()  

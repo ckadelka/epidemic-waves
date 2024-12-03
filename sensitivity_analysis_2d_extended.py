@@ -10,28 +10,28 @@ from scipy.signal import find_peaks
 
 from func_file_utils import save_data, load_data
 from func_draw_heatmap import draw_heatmap
-import model
+import model_extended
 
 def find_peak_nums(results,min_prominence=0.002):
     peaks, _ = find_peaks(results[:, 1], prominence=min_prominence)
     return len(peaks)
 
-def x_y_sensitivity(x_range, y_range, x_param_name, y_param_name, dt=1, t_end=500, case='Hill', k=16):
+def x_y_sensitivity(x_range, y_range, x_param_name, y_param_name, dt=1, t_end=500, case='Hill', k=16, beta_e=0):
     number_of_waves = np.zeros((len(y_range), len(x_range)))
     final_epidemic_sizes = np.zeros((len(y_range), len(x_range)))
     for i, y in enumerate(y_range):
         for j, x in enumerate(x_range):
             if 'k' not in [x_param_name,y_param_name]:
-                parameters = {x_param_name: x, y_param_name: y, 'dt': dt, 't_end': t_end, 'case': case, 'k':k}
+                parameters = {x_param_name: x, y_param_name: y, 'dt': dt, 't_end': t_end, 'case': case, 'k':k, 'beta_e':beta_e }
             else:
-                parameters = {x_param_name: x, y_param_name: y, 'dt': dt, 't_end': t_end, 'case': case}
-            ts, results, _, _ = model.simulate(**parameters)
+                parameters = {x_param_name: x, y_param_name: y, 'dt': dt, 't_end': t_end, 'case': case, 'beta_e':beta_e}
+            ts, results, _, _ = model_extended.simulate(**parameters)
             wave_num = find_peak_nums(results)
             number_of_waves[i, j] = wave_num
             final_epidemic_sizes[i,j] = 100-results[-1,0]
     return number_of_waves,final_epidemic_sizes
 
-def calculate_sensitivity_matrices(dt = 1,case='Hill',k=16,tau_min=0,tau_max=20,t_end = 500):
+def calculate_sensitivity_matrices(dt = 1,case='Hill',k=16,tau_min=0,tau_max=20,t_end = 500,beta_e=0):
     assert tau_min >=0, 'tau_min >= 0 required'
     assert tau_min < tau_max, 'tau_max > tau_max required'
     n_steps = round((tau_max-tau_min) / dt + 1)
@@ -44,10 +44,10 @@ def calculate_sensitivity_matrices(dt = 1,case='Hill',k=16,tau_min=0,tau_max=20,
     beta_range = np.linspace(0.2, 0.8, n_steps)
     gamma_range = np.linspace(0.1, 0.4, n_steps)
         
-    matrix_tau_c = x_y_sensitivity(tau_range, c_range, 'tau', 'c', dt,case=case,k=k,t_end=t_end)
-    matrix_tau_k = x_y_sensitivity(tau_range, k_range, 'tau', 'k', dt,case=case,t_end=t_end)
-    matrix_tau_beta = x_y_sensitivity(tau_range, beta_range, 'tau', 'beta', dt,case=case,k=k,t_end=t_end)
-    matrix_tau_gamma = x_y_sensitivity(tau_range, gamma_range, 'tau', 'gamma', dt,case=case,k=k,t_end=t_end)
+    matrix_tau_c = x_y_sensitivity(tau_range, c_range, 'tau', 'c', dt,case=case,k=k,t_end=t_end,beta_e=beta_e)
+    matrix_tau_k = x_y_sensitivity(tau_range, k_range, 'tau', 'k', dt,case=case,t_end=t_end,beta_e=beta_e)
+    matrix_tau_beta = x_y_sensitivity(tau_range, beta_range, 'tau', 'beta', dt,case=case,k=k,t_end=t_end,beta_e=beta_e)
+    matrix_tau_gamma = x_y_sensitivity(tau_range, gamma_range, 'tau', 'gamma', dt,case=case,k=k,t_end=t_end,beta_e=beta_e)
     
     data_dict = {
         'beta_range': beta_range,
@@ -61,7 +61,7 @@ def calculate_sensitivity_matrices(dt = 1,case='Hill',k=16,tau_min=0,tau_max=20,
         'matrix_tau_gamma': matrix_tau_gamma,
     }
     
-    save_data(data_dict,'sensitivity_matrices_for_%s_with_%i_mesh.pkl' % (case,len(tau_range)))
+    save_data(data_dict,'sensitivity_matrices_for_%s_with_%i_mesh_SEIR.pkl' % (case,len(tau_range)))
 
 
 if __name__ == "__main__":
@@ -69,14 +69,15 @@ if __name__ == "__main__":
     tau_max = 20 #days
     tau_min = 0 #days
     t_end = 1000 #days
-    case = 'sigmoid'
-    k = 250
+    case = 'Hill'
+    k = 16
+    beta_e = 0.5
     
     len_tau_range = round((tau_max-tau_min) / dt + 1)    
-    calculate_sensitivity_matrices(dt=dt,case=case,k=k,t_end=t_end,tau_min=tau_min,tau_max=tau_max)
+    calculate_sensitivity_matrices(dt=dt,case=case,k=k,t_end=t_end,tau_min=tau_min,tau_max=tau_max,beta_e=beta_e)
     
     try:
-        data = load_data('sensitivity_matrices_for_%s_with_%i_mesh.pkl' % (case,len_tau_range))
+        data = load_data('sensitivity_matrices_for_%s_with_%i_mesh_SEIR.pkl' % (case,len_tau_range))
         print("Data loaded successfully")
     except FileNotFoundError as e:
         print(e)
