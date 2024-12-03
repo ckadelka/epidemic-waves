@@ -13,5 +13,6 @@ for the behavioral SIR model, as well as
 - plot_basic_figures_extended.py,
 - sensitivity_analysis_2d_extended.py,
 - sensitivity_analysis_4d_extended.py
+  
 for the behavioral SEIR model.
 
