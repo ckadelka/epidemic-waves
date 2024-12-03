@@ -8,6 +8,7 @@ All figures and analyses in the manuscript can be recreated by running the files
 - plot_basic_figures.py,
 - sensitivity_analysis_2d.py,
 - sensitivity_analysis_4d.py,
+  
 for the behavioral SIR model, as well as
 - plot_basic_figures_extended.py,
 - sensitivity_analysis_2d_extended.py,
