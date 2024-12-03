@@ -65,7 +65,7 @@ def calculate_sensitivity_matrices(dt = 1,case='Hill',k=16,tau_min=0,tau_max=20,
 
 
 if __name__ == "__main__":
-    dt = 0.125 #days
+    dt = 1 #days
     tau_max = 20 #days
     tau_min = 0 #days
     t_end = 1000 #days

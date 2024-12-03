@@ -12,6 +12,44 @@ import math
 
 @jit(nopython=True)
 def SIR_with_delayed_reduction(y, t, beta, gamma, c, k, N, log10_delayed_prevalence, dt, case):
+    """
+    Simulates the SIR model with a delayed reduction mechanism based on a prevalence-dependent function.
+
+    Parameters:
+    ----------
+    y : array-like
+        Initial state vector [S, I, R], where:
+          S : Susceptible population.
+          I : Infected population.
+          R : Recovered population.
+    t : float
+        Current time step.
+    beta : float
+        Transmission rate.
+    gamma : float
+        Recovery rate, i.e. Reciprocal of the average time in infected state.
+    c : float
+        Behavioral response midpoint.
+    k : float
+        Behavioral response sensitivity.
+    N : int
+        Total population.
+    log10_delayed_prevalence : float
+        Logarithm (base 10) of delayed prevalence (I / N).
+    dt : float
+        Time step size.
+    case : str
+        Reduction mechanism:
+          'Hill' : Hill function-based reduction.
+          'sigmoid' : Sigmoid-based reduction.
+          'noReduction' : No reduction in transmission.
+
+    Returns:
+    -------
+    dy : array-like
+        Rate of change [dS, dI, dR].
+    """
+    
     S, I, R = y
     if case=='Hill':
         reduction = 1 - 1 / (1 + (c/log10_delayed_prevalence)**k)
@@ -29,8 +67,42 @@ def SIR_with_delayed_reduction(y, t, beta, gamma, c, k, N, log10_delayed_prevale
 @jit(nopython=True)
 def RK4(func, X0, ts, beta, gamma, c, k, N, tau, dt, case): 
     """
-    Runge Kutta 4 solver.
+    Implements the 4th-order Runge-Kutta (RK4) method to solve the SIR model.
+
+    Parameters:
+    ----------
+    func : callable
+        Function to evaluate derivatives (e.g., SIR_with_delayed_reduction).
+    X0 : array-like
+        Initial state vector [S, I, R].
+    ts : array-like
+        Time points for simulation.
+    beta : float
+        Transmission rate.
+    gamma : float
+        Recovery rate, i.e. Reciprocal of the average time in infected state.
+    c : float
+        Behavioral response midpoint.
+    k : float
+        Behavioral response sensitivity.
+    N : int
+        Total population.
+    tau : float
+        Delay time for reduction to take effect.
+    dt : float
+        Time step size.
+    case : str
+        Reduction mechanism:
+          'Hill' : Hill function-based reduction.
+          'sigmoid' : Sigmoid-based reduction.
+          'noReduction' : No reduction in transmission.
+
+    Returns:
+    -------
+    X : array-like
+        Simulated trajectories of [S, I, R] at each time step.
     """
+    
     nt = len(ts)
     X  = np.zeros((nt, 3),dtype=np.float64)
     X[0,:] = X0
@@ -50,6 +122,53 @@ def RK4(func, X0, ts, beta, gamma, c, k, N, tau, dt, case):
     return X
 
 def simulate(N=5000, I0_proportion=0.0002, beta=0.4, gamma=0.2, c=2, k=16, tau=0, dt=0.1, case='Hill', t_end=500):
+    """
+    Computes the dynamics of the SIR model with delayed human behavioral responses and calculates additional outputs.
+
+    Parameters:
+    ----------
+    N : int, default=5000
+        Total population (note: the model dynamics do not depend on N, just ensure N>0)
+    I0_proportion : float, default=0.0002
+        Initial proportion of infected individuals.
+    beta : float, default=0.4
+        Transmission rate.
+    gamma : float, default=0.2
+        Recovery rate, i.e. Reciprocal of the average time in infected state.
+    c : float, default=2
+        Behavioral response midpoint.
+    k : float, default=16
+        Behavioral response sensitivity.
+    tau : float, default=0
+        Delay time in reduction.
+    dt : float, default=0.1
+        Time step size.
+    case : str
+        Reduction mechanism:
+          'Hill' : Hill function-based reduction. (default)
+          'sigmoid' : Sigmoid-based reduction.
+          'noReduction' : No reduction in transmission.
+    t_end : float, default=500
+        End time for the simulation.
+
+    Returns:
+    -------
+    ts : array-like
+        Time points of the simulation.
+    results : array-like
+        Normalized percentages of [S, I, R].
+    reduction : array-like
+        Reduction in transmission rate over time.
+    Reffs : array-like
+        Effective reproduction numbers over time.
+
+    Notes:
+    ------
+    The function applies either a Hill or sigmoid reduction based on delayed prevalence. 
+    For 'noReduction', no modification to transmission occurs.
+    Normalized outputs are returned as percentages.
+    """
+    
     ts = np.linspace(0, t_end, round(t_end / dt) + 1)
     x0 = np.array([N*(1-I0_proportion), N*I0_proportion, 0],dtype=np.float64)
     if case=='Hill':
@@ -70,6 +189,7 @@ def simulate(N=5000, I0_proportion=0.0002, beta=0.4, gamma=0.2, c=2, k=16, tau=0
     else:
         reduction = np.zeros(len(ts))
     Reffs = (1 - reduction) * (results[:, 0] / N) * (beta / gamma)
+    
     return ts, results/N*100, reduction, Reffs
 
     

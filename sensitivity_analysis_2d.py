@@ -73,13 +73,17 @@ if __name__ == "__main__":
     k = 250
     
     len_tau_range = round((tau_max-tau_min) / dt + 1)    
-    calculate_sensitivity_matrices(dt=dt,case=case,k=k,t_end=t_end,tau_min=tau_min,tau_max=tau_max)
     
     try:
         data = load_data('sensitivity_matrices_for_%s_with_%i_mesh.pkl' % (case,len_tau_range))
         print("Data loaded successfully")
-    except FileNotFoundError as e:
-        print(e)
+    except FileNotFoundError:
+        calculate_sensitivity_matrices(dt=dt,case=case,k=k,t_end=t_end,tau_min=tau_min,tau_max=tau_max)
+        try:
+            data = load_data('sensitivity_matrices_for_%s_with_%i_mesh.pkl' % (case,len_tau_range))
+            print("Data loaded successfully")
+        except FileNotFoundError as e:
+            print(e)
         
     figsize = (4,3)
     
