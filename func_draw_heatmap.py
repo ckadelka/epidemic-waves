@@ -25,7 +25,7 @@ def infer_ticks(ticks,parameter_values):
     return np.array([infer_index_given_min_max_number(el,min_value,max_value,number) for el in ticks])
 
 
-def draw_heatmap(matrix,x_range,y_range,x_param_name,y_param_name,subfolder_name,global_max=None,global_min=None,figsize=(6,4.5),cmap='jet',FES=False,SHOWARGMAX=False,countour_matrix=None,NORMALIZE_BY_Y=False,COMPARE_TO_CLASSICAL=True,clines_color='white'):
+def draw_heatmap(matrix,x_range,y_range,x_param_name,y_param_name,subfolder_name,global_max=None,global_min=None,figsize=(6,4.5),cmap='jet',FES=False,SHOWARGMAX=False,countour_matrix=None,NORMALIZE_BY_Y=False,COMPARE_TO_CLASSICAL=True,clines_color='white',suffix=''):
     folder_name = os.path.join('data', subfolder_name)
     if not os.path.exists(folder_name):
         os.makedirs(folder_name)
@@ -184,7 +184,7 @@ def draw_heatmap(matrix,x_range,y_range,x_param_name,y_param_name,subfolder_name
         CS = ax.contour(X,Y,countour_matrix,colors=clines_color,levels=min(10,int(countour_matrix.max())-1),linewidths=0.75)
         #ax.clabel(CS, inline=True, fontsize=6)
 
-    file_path = os.path.join(folder_name, 'sen_'+str(x_param_name)+'_'+str(y_param_name)+'_with_'+str(len(x_range))+'_mesh.pdf')
+    file_path = os.path.join(folder_name, 'sen_'+str(x_param_name)+'_'+str(y_param_name)+'_with_'+str(len(x_range))+'_mesh'+suffix+'.pdf')
     plt.savefig(file_path, format='pdf', bbox_inches='tight')
     plt.show()
     
